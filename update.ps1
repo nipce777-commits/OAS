@@ -55,7 +55,12 @@ $patchFiles = @(Get-ChildItem -Path "patches" -Filter "*.patch" -File | Sort-Obj
     if ($applied -contains $pf.Name) { continue }
 
     Write-Host "Applying patch: $($pf.Name)"
-    git apply --whitespace=fix "$($pf.FullName)"
+        $applyOut = & git apply --whitespace=fix "$($pf.FullName)" 2>&1
+    if ($LASTEXITCODE -ne 0) {
+      Write-Host "Patch failed: $($pf.Name)"
+      Write-Host $applyOut
+      throw "git apply failed"
+    }
 
     # Commit patch changes
     git add -A
@@ -69,6 +74,12 @@ $patchFiles = @(Get-ChildItem -Path "patches" -Filter "*.patch" -File | Sort-Obj
 }
 
 function Push-IfNeeded {
+  # Push only if local main is ahead of origin/main
+  $ahead = (& git rev-list --count origin/main..HEAD).Trim()
+  if ($ahead -eq "0") {
+    Write-Host "Nothing to push."
+    return
+  }
   Write-Host "Pushing to origin/main..."
   git push origin main
 }
@@ -85,6 +96,7 @@ if ($hadChanges) {
 } else {
   Write-Host "Done. Nothing to apply."
 }
+
 
 
 
