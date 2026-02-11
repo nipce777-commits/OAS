@@ -42,7 +42,7 @@ function Mark-Applied([string]$patchName) {
 
 function Apply-NewPatches {
   $applied = Read-AppliedPatches
-  $patchFiles = Get-ChildItem -Path "patches" -Filter "*.patch" -File | Sort-Object Name
+  `$patchFiles = @(Get-ChildItem -Path "patches" -Filter "*.patch" -File | Sort-Object Name)
 
   if ($patchFiles.Count -eq 0) {
     Write-Host "No patches found in patches/."
@@ -85,3 +85,4 @@ if ($hadChanges) {
 } else {
   Write-Host "Done. Nothing to apply."
 }
+
