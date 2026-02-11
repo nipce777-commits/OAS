@@ -6,3 +6,7 @@ dist/
 build/
 .env
 .env.*
+
+# Local patch inbox (not tracked)
+patches/*.patch
+
